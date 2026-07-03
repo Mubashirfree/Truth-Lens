@@ -1,0 +1,33 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+model Verification {
+  id             String             @id @default(uuid())
+  mediaType      String             
+  mediaUrl       String?
+  textContent    String?
+  prompt         String?
+  status         String             @default("PENDING")
+  progress       String             @default("Queueing request...")
+  trustScore     Int?               // 0 to 100
+  feedback       Json?              // Factual breakdown and detailed notes
+  sources        Source[]
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+}
+
+model Source {
+  id             String       @id @default(uuid())
+  verificationId String
+  verification   Verification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  title          String
+  url            String
+  snippet        String
+  content        String?      // Scraped content text
+}
